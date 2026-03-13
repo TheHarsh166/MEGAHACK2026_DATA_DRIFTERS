@@ -153,6 +153,32 @@ async def get_student_attempts(userId: str, concept: str):
     except Exception as exc:
         return {"error": f"Failed to fetch attempts: {exc}"}
 
+from ML.feature3_student_knowledge_tracking.services.tutor_service import get_tutor_response
+
+class TutorChatRequest(BaseModel):
+    userId: str
+    misunderstood_concept: str
+    student_explanation: str
+    history: List[dict] # [{role: "user", content: "..."}, {role: "assistant", content: "..."}]
+
+@app.post("/api/tutor/chat")
+async def tutor_chat(request: TutorChatRequest):
+    """
+    Handle chat interaction with AI tutor.
+    """
+    print(f"\n[API] Received tutor chat: User: {request.userId} | Concept: {request.misunderstood_concept}")
+    
+    try:
+        tutor_result = await get_tutor_response(
+            misunderstood_concept=request.misunderstood_concept,
+            student_explanation=request.student_explanation,
+            history=request.history
+        )
+        return tutor_result
+    except Exception as exc:
+        print(f"[API] ERROR during tutor chat: {exc}")
+        return {"error": f"Tutor chat failed: {str(exc)}"}
+
 @app.post("/api/submit-answer")
 async def submit_answer_integrated(request: UnifiedSubmitRequest):
     """

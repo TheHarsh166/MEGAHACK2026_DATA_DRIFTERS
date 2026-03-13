@@ -85,6 +85,16 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
 
       setResult(evaluation);
 
+      // Trigger AI Tutor if misconception detected
+      if (evaluation.misconception && evaluation.misconception.misconception_detected) {
+        window.dispatchEvent(new CustomEvent('tutor-activate', { 
+          detail: { 
+            concept: concept, 
+            explanation: reasoning 
+          } 
+        }));
+      }
+
       // Trigger refresh in parent
       if (onSuccess) onSuccess();
 
