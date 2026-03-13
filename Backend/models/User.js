@@ -15,20 +15,19 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Hash password before saving - Using async/await for Mongoose v9+
-userSchema.pre('save', async function(next) {
+// Hash password before saving - Modern async/await pattern for Mongoose v9+
+userSchema.pre('save', async function() {
   const user = this;
-  if (!user.isModified('password')) return next();
+  if (!user.isModified('password')) return;
 
   try {
     console.log('Hashing password for:', user.email);
     const hash = await bcrypt.hash(user.password, 10);
     user.password = hash;
     console.log('Password hashed successfully');
-    next();
   } catch (err) {
     console.error('Bcrypt error:', err);
-    next(err);
+    throw err;
   }
 });
 

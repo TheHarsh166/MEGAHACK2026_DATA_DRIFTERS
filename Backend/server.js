@@ -58,8 +58,10 @@ app.post('/api/auth/signup', async (req, res) => {
       user: { id: user._id, email: user.email }
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('SIGNUP ERROR:', err);
+    res.status(500).json({ error: err.message, details: 'Check server logs for stack trace' });
   }
+
 });
 
 app.post('/api/auth/login', async (req, res) => {
