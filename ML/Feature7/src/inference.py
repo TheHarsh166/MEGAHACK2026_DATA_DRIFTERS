@@ -50,14 +50,16 @@ class MisconceptionDetector:
             4: "Misapplied Principle / Reasoning Error"
         }
 
-    def detect_misconception(self, student_explanation: str) -> dict:
+    def detect_misconception(self, student_explanation: str, selected_answer: str = None, correct_answer: str = None) -> dict:
         """
-        Takes a student's explanation and predicts structural misconception classes.
-        Uses trained model if available, otherwise uses enhanced heuristic logic.
+        Takes a student's explanation and optionally their answer choice.
+        Predicts misconception classes and assesses overall understanding strength.
         """
+        is_answer_correct = (selected_answer == correct_answer) if (selected_answer and correct_answer) else None
+        
         if not self.is_loaded:
             # Enhanced fallback logic for when model is missing
-            cleaned_text = student_explanation.lower()
+            cleaned_explanation = student_explanation.lower()
             misconception_detected = False
             misconception_class_str = ""
             confidence_val = 0.6
@@ -68,33 +70,49 @@ class MisconceptionDetector:
             conceptual_error_patterns = ["stop", "need force", "pushing", "pulling", "requires force to move", "force makes it move"]
             missing_info_patterns = ["because", "just", "it is", "that's how", "that's why", "obviously"]
             
-            if any(word in cleaned_text for word in uncertainty_patterns):
+            if any(word in cleaned_explanation for word in uncertainty_patterns):
                 misconception_detected = True
                 misconception_class_str = "Unrelated / Missing Information"
                 confidence_val = 0.7
-            elif any(word in cleaned_text for word in factual_error_patterns):
+            elif any(word in cleaned_explanation for word in factual_error_patterns):
                 misconception_detected = True
                 misconception_class_str = "Factual Error / Direct Contradiction"
                 confidence_val = 0.75
-            elif any(word in cleaned_text for word in conceptual_error_patterns):
+            elif any(word in cleaned_explanation for word in conceptual_error_patterns):
                 misconception_detected = True
                 misconception_class_str = "Conceptual Misunderstanding"
                 confidence_val = 0.8
-            elif any(word in cleaned_text for word in missing_info_patterns) and len(cleaned_text) < 20:
+            elif any(word in cleaned_explanation for word in missing_info_patterns) and len(cleaned_explanation) < 20:
                 misconception_detected = True
                 misconception_class_str = "Unrelated / Missing Information"
                 confidence_val = 0.65
-            elif len(cleaned_text) < 10:
+            elif len(cleaned_explanation) < 10:
                 misconception_detected = True
                 misconception_class_str = "Unrelated / Missing Information"
                 confidence_val = 0.7
 
+            # Determine understanding strength
+            if is_answer_correct is True:
+                if not misconception_detected:
+                    strength = "Strong"
+                    explanation_msg = "Correct answer with sound reasoning. Great understanding!"
+                else:
+                    strength = "Moderate"
+                    explanation_msg = f"Correct answer, but reasoning shows potentially a lucky guess or {misconception_class_str}."
+            elif is_answer_correct is False:
+                strength = "Weak"
+                explanation_msg = f"Incorrect answer and reasoning suggests: {misconception_class_str or 'misunderstanding'}."
+            else:
+                strength = "N/A"
+                explanation_msg = f"Reasoning suggests: {misconception_class_str}." if misconception_detected else "Reasoning appears reasonable."
+
             return {
                 "misconception_detected": misconception_detected,
                 "misconception": misconception_class_str if misconception_detected else "No Misconception",
-                "concept": "Newton's First Law" if "force" in cleaned_text or "motion" in cleaned_text else "General Scientific Concept",
+                "concept": "Newton's First Law" if "force" in cleaned_explanation or "motion" in cleaned_explanation else "General Scientific Concept",
                 "confidence": confidence_val,
-                "explanation": f"The student's reasoning suggests: {misconception_class_str}. Consider providing more detailed explanation." if misconception_detected else "The student's reasoning appears reasonable. Encourage deeper explanation for better assessment."
+                "understanding_strength": strength,
+                "explanation": explanation_msg
             }
             
         from src.preprocessing import clean_text
@@ -119,19 +137,35 @@ class MisconceptionDetector:
         misconception_detected = (pred_label_id != 0)
         misconception_class_str = self.label_map.get(pred_label_id, "Unknown Structure")
         
+        # Determine understanding strength for model-based inference
+        if is_answer_correct is True:
+            if not misconception_detected:
+                strength = "Strong"
+                explanation_msg = "Valid reasoning supporting the correct choice."
+            else:
+                strength = "Moderate"
+                explanation_msg = f"Correct choice, but reasoning indicates: {misconception_class_str}."
+        elif is_answer_correct is False:
+            strength = "Weak"
+            explanation_msg = f"Incorrect answer with reasoning exhibiting: {misconception_class_str}."
+        else:
+            strength = "N/A"
+            explanation_msg = f"Reasoning exhibits: {misconception_class_str}" if misconception_detected else "Reasoning appears factual."
+
         return {
             "misconception_detected": misconception_detected,
             "misconception": misconception_class_str if misconception_detected else "",
             "concept": "Newton's First Law" if "force" in cleaned_text else "General Scientific Concept",
             "confidence": round(confidence_val, 4),
-            "explanation": f"The student's reasoning exhibits: {misconception_class_str}" if misconception_detected else "The student's reasoning appears factual."
+            "understanding_strength": strength,
+            "explanation": explanation_msg
         }
 
 # Pre-initialized global instance
 detector = MisconceptionDetector()
 
-def detect_misconception(student_explanation: str) -> dict:
+def detect_misconception(student_explanation: str, selected_answer: str = None, correct_answer: str = None) -> dict:
     """
     Public entrypoint function intended to be imported directly by backend developers.
     """
-    return detector.detect_misconception(student_explanation)
+    return detector.detect_misconception(student_explanation, selected_answer, correct_answer)

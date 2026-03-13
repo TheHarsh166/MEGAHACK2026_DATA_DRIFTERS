@@ -11,20 +11,24 @@ import toast from 'react-hot-toast';
  */
 function QuestionCard({ concept, questionData, index, onSuccess }) {
   const [selectedOption, setSelectedOption] = useState('');
+  const [reasoning, setReasoning] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
   const handleSubmit = async () => {
     if (!selectedOption) return;
+    if (!reasoning.trim()) {
+      toast.error("Please provide a reasoning for your choice.");
+      return;
+    }
 
     setLoading(true);
     setResult(null);
 
     const user = JSON.parse(localStorage.getItem('thinkmap_user') || '{}');
 
-    // Check if MCQ or Textual
-    const isMCQ = questionData.is_mcq !== false && questionData.options;
-    const selectedOptionNumber = isMCQ ? (questionData.options.findIndex(opt => opt === selectedOption) + 1) : null;
+    // All questions are now standard MCQs
+    const selectedOptionNumber = questionData.options.findIndex(opt => opt === selectedOption) + 1;
 
     try {
       // Check if server is reachable first
@@ -51,7 +55,7 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
           questionText: questionData.question,
           options: questionData.options || [],
           correctAnswer: questionData.answer,
-          explanation: isMCQ ? ("Student selected: " + selectedOption) : selectedOption
+          explanation: reasoning
         }),
         signal: AbortSignal.timeout(30000) // 30 second timeout for the actual request
       });
@@ -129,51 +133,52 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
       </div>
 
       <div className="answer-input" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {questionData.options && questionData.options.length > 0 ? (
-          questionData.options.map((option, i) => (
-            <label key={i} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              borderRadius: '8px',
-              backgroundColor: selectedOption === option ? '#1e293b' : '#020617',
-              border: `1px solid ${selectedOption === option ? '#38bdf8' : '#1e293b'}`,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              <input
-                type="radio"
-                name={`question-${index}`}
-                value={option}
-                checked={selectedOption === option}
-                onChange={(e) => setSelectedOption(e.target.value)}
-                disabled={result !== null}
-                style={{ accentColor: '#38bdf8' }}
-              />
-              <span style={{ color: '#e5e7eb' }}>{option}</span>
-            </label>
-          ))
-        ) : (
+        {questionData.options.map((option, i) => (
+          <label key={i} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '8px',
+            backgroundColor: selectedOption === option ? '#1e293b' : '#020617',
+            border: `1px solid ${selectedOption === option ? '#38bdf8' : '#1e293b'}`,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}>
+            <input
+              type="radio"
+              name={`question-${index}`}
+              value={option}
+              checked={selectedOption === option}
+              onChange={(e) => setSelectedOption(e.target.value)}
+              disabled={result !== null}
+              style={{ accentColor: '#38bdf8' }}
+            />
+            <span style={{ color: '#e5e7eb' }}>{option}</span>
+          </label>
+        ))}
+        
+        <div style={{ marginTop: '1rem' }}>
+          <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Explain your reasoning:</p>
           <textarea
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value)}
+            value={reasoning}
+            onChange={(e) => setReasoning(e.target.value)}
             disabled={result !== null}
-            placeholder="Type your answer here..."
+            placeholder="Why did you choose this option?"
             style={{
               width: '100%',
-              minHeight: '120px',
+              minHeight: '80px',
               padding: '1rem',
               borderRadius: '8px',
               backgroundColor: '#020617',
               border: '1px solid #1e293b',
               color: '#f9fafb',
-              fontSize: '1rem',
+              fontSize: '0.95rem',
               outline: 'none',
               resize: 'vertical'
             }}
           />
-        )}
+        </div>
       </div>
 
       <button

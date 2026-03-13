@@ -172,7 +172,11 @@ async def submit_answer_integrated(request: UnifiedSubmitRequest):
     
     try:
         # 1. Misconception Detection (Feature 7) - Run first to use in recommendations
-        misconception_result = detect_misconception(request.explanation)
+        misconception_result = detect_misconception(
+            request.explanation,
+            selected_answer=request.selectedAnswer,
+            correct_answer=request.correctAnswer
+        )
         print(f"[API] Feature7 - Misconception detected: {misconception_result.get('misconception_detected', False)}")
         
         # 2. Learning Recommendations (Feature 8) - Use misconception result with context

@@ -23,10 +23,9 @@ class GeminiQuizClient:
     def generate_questions(self, concept: str, max_retries: int = 1) -> str:
         prompt = (
             "You are an expert educator.\n\n"
-            f"Generate 3 diverse questions EXCLUSIVELY for the concept: {concept}\n\n"
+            f"Generate 3 diverse Multiple-Choice Questions (MCQ) EXCLUSIVELY for the concept: {concept}\n\n"
             "Requirements:\n"
-            "• Generate 2 Multiple-Choice Questions (MCQ)\n"
-            "• Generate 1 Descriptive/Short Answer Question (Textual)\n"
+            "• Generate exactly 3 Multiple-Choice Questions (MCQ)\n"
             "• THE QUESTIONS MUST BE DIRECTLY ABOUT THE GIVEN CONCEPT. DO NOT ASK GENERAL OR UNRELATED QUESTIONS.\n\n"
             "Return JSON format:\n"
             "{\n"
@@ -37,12 +36,6 @@ class GeminiQuizClient:
             '      "question": "string",\n'
             '      "options": ["string", "string", "string", "string"],\n'
             '      "answer": "string (the exact text of the correct option)"\n'
-            "    },\n"
-            "    {\n"
-            '      "type": "conceptual | application | definition",\n'
-            '      "is_mcq": false,\n'
-            '      "question": "string",\n'
-            '      "answer": "string (the ideal short answer or key points)"\n'
             "    }\n"
             "  ]\n"
             "}\n"
