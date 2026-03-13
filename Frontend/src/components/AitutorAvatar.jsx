@@ -54,34 +54,34 @@ const AvatarModel = ({ isSpeaking, audioAmplitude }) => {
     <group position={[0, -0.5, 0]}>
       {/* Body / Chest */}
       <RoundedBox args={[0.8, 0.6, 0.4]} radius={0.1} smoothness={4}>
-        <meshStandardMaterial color="#1e293b" />
+        <meshStandardMaterial color="#27272a" />
       </RoundedBox>
 
       {/* Head */}
       <group ref={headRef} position={[0, 0.6, 0]}>
         {/* Face */}
         <RoundedBox args={[0.6, 0.6, 0.4]} radius={0.15} smoothness={4}>
-          <meshStandardMaterial color="#334155" />
+          <meshStandardMaterial color="#3f3f46" />
         </RoundedBox>
 
         {/* Eyes */}
         <group position={[0, 0.1, 0.21]}>
           <Box args={[0.1, 0.05, 0.01]} position={[-0.15, 0, 0]}>
-            <meshBasicMaterial color="#38bdf8" />
+            <meshBasicMaterial color="#ffffff" />
           </Box>
           <Box args={[0.1, 0.05, 0.01]} position={[0.15, 0, 0]}>
-            <meshBasicMaterial color="#38bdf8" />
+            <meshBasicMaterial color="#ffffff" />
           </Box>
         </group>
 
         {/* Mouth */}
         <Box ref={mouthRef} args={[0.15, 0.02, 0.01]} position={[0, -0.15, 0.21]}>
-          <meshBasicMaterial color="#38bdf8" />
+          <meshBasicMaterial color="#ffffff" />
         </Box>
       </group>
 
       {/* Background Glow */}
-      <pointLight position={[0, 0, -1]} intensity={1} color="#38bdf8" />
+      <pointLight position={[0, 0, -1]} intensity={1} color="#ffffff" />
     </group>
   );
 };

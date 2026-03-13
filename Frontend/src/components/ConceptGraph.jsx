@@ -73,39 +73,15 @@ function ConceptGraph({ data, onSelectNode, knowledgeStates }) {
     // If we have knowledge state for this node, use it
     if (knowledgeStates && knowledgeStates[stateKey]) {
       const state = knowledgeStates[stateKey];
-      if (state === 'green') return '#22c55e'; // Mastering Green
-      if (state === 'yellow') return '#eab308'; // Learning Yellow
-      if (state === 'red') return '#ef4444'; // Struggling Red
+      if (state === 'green') return '#22c55e'; // Success Green
+      if (state === 'yellow') return '#eab308'; // Warning Yellow
+      if (state === 'red') return '#ef4444'; // Error Red
     }
 
-    if (node.group === 'root') return '#2563eb'; // blue
-    if (node.group === 'subtopic') return '#f97316'; // orange
-    return '#9ca3af'; // gray
-  }
+    if (node.group === 'root') return '#ffffff'; // white
+    if (node.group === 'subtopic') return '#d1d5db'; // light gray
 
-  // Custom canvas rendering so labels are always visible & styled.
-  const nodeCanvasObject = (node, ctx, globalScale) => {
-    const label = String(node.id)
-    const fontSize = 11 / globalScale
-
-    // Draw node circle
-    const radius = nodeVal(node)
-    ctx.beginPath()
-    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false)
-    ctx.fillStyle = nodeColor(node)
-    ctx.fill()
-
-    // Subtle outline for depth
-    ctx.strokeStyle = '#ffffff33'
-    ctx.lineWidth = 1 / globalScale
-    ctx.stroke()
-
-    // Draw label
-    ctx.font = `${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'top'
-    ctx.fillStyle = '#f9fafb'
-    ctx.fillText(label, node.x, node.y + radius + 2)
+    return '#6b7280'; // gray
   }
 
   if (!graphData.nodes.length) {
@@ -142,9 +118,12 @@ function ConceptGraph({ data, onSelectNode, knowledgeStates }) {
     nodeRelSize: 1,
     nodeVal,
     nodeColor,
-    linkColor: () => '#f9fafb',
-    linkOpacity: 0.6,
-    linkDirectionalParticles: 0,
+    linkColor: () => mode3D ? '#a1a1aa' : '#444444',
+    linkOpacity: 0.4,
+    linkDirectionalParticles: 2,
+    linkDirectionalParticleSpeed: 0.005,
+    linkDirectionalParticleWidth: 1.5,
+    linkDirectionalParticleColor: () => '#ffffff',
     linkWidth: 1,
     warmupTicks: 80,
     cooldownTicks: 200,
@@ -153,30 +132,85 @@ function ConceptGraph({ data, onSelectNode, knowledgeStates }) {
     onNodeClick: handleNodeClick,
     width: dimensions.width,
     height: dimensions.height,
-    nodeRelSize: 1, // Keep base size 1, we use nodeVal directly
   }
 
-  // 3D Node + Label styling
+  // 3D Node + Label styling with glow effect
   const nodeThreeObject = (node) => {
+    const isSelected = selectedNodeId === String(node.id)
+    const radius = nodeVal(node)
+    
     // Basic sphere for the node
-    const geometry = new THREE.SphereGeometry(nodeVal(node))
-    const material = new THREE.MeshLambertMaterial({ 
+    const geometry = new THREE.SphereGeometry(radius)
+    const material = new THREE.MeshStandardMaterial({ 
       color: nodeColor(node),
       transparent: true,
-      opacity: 0.9
+      opacity: 0.9,
+      emissive: isSelected ? '#ffffff' : '#000000',
+      emissiveIntensity: isSelected ? 0.5 : 0
     })
     const sphere = new THREE.Mesh(geometry, material)
 
+    // Add glow effect (using a slightly larger, transparent sphere)
+    if (isSelected) {
+      const glowGeo = new THREE.SphereGeometry(radius * 1.4)
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: '#ffffff',
+        transparent: true,
+        opacity: 0.2
+      })
+      const glow = new THREE.Mesh(glowGeo, glowMat)
+      sphere.add(glow)
+    }
+
     // Add white text label
     const sprite = new SpriteText(String(node.id))
-    sprite.color = '#ffffff'
+    sprite.color = isSelected ? '#ffffff' : '#a1a1aa'
     sprite.textHeight = mode3D ? 12 : 8
-    sprite.position.y = nodeVal(node) + 5 // Position just above the sphere
+    sprite.position.y = radius + 8
     
     const group = new THREE.Group()
     group.add(sphere)
     group.add(sprite)
     return group
+  }
+
+  // Enhanced 2D canvas rendering
+  const nodeCanvasObject = (node, ctx, globalScale) => {
+    const label = String(node.id)
+    const fontSize = 11 / globalScale
+    const isSelected = selectedNodeId === String(node.id)
+    const radius = nodeVal(node)
+
+    // Draw shadow/glow
+    ctx.shadowColor = isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.5)'
+    ctx.shadowBlur = (isSelected ? 10 : 4) / globalScale
+    
+    // Draw node circle
+    ctx.beginPath()
+    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false)
+    ctx.fillStyle = nodeColor(node)
+    ctx.fill()
+    
+    // Reset shadow for subsequent drawings
+    ctx.shadowBlur = 0
+
+    // Highlight border for selected node
+    if (isSelected) {
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = 2 / globalScale
+      ctx.stroke()
+    } else {
+      ctx.strokeStyle = '#ffffff33'
+      ctx.lineWidth = 1 / globalScale
+      ctx.stroke()
+    }
+
+    // Draw label
+    ctx.font = `${isSelected ? 'bold ' : ''}${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'top'
+    ctx.fillStyle = isSelected ? '#ffffff' : '#a1a1aa'
+    ctx.fillText(label, node.x, node.y + radius + 4)
   }
 
   return (

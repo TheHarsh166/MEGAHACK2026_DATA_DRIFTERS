@@ -11,14 +11,21 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
-  }
+    required: false
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  name: String,
+  picture: String
 }, { timestamps: true });
 
 // Hash password before saving - Modern async/await pattern for Mongoose v9+
 userSchema.pre('save', async function() {
   const user = this;
-  if (!user.isModified('password')) return;
+  if (!user.isModified('password') || !user.password) return;
 
   try {
     console.log('Hashing password for:', user.email);

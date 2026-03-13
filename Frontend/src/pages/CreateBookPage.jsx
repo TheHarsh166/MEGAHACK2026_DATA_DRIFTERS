@@ -24,6 +24,7 @@ function CreateBookPage() {
   const [file, setFile] = useState(null);
   const [viewMode, setViewMode] = useState('map'); // 'map' or 'notes'
 
+  const [recommendation, setRecommendation] = useState(null);
   const [knowledgeStates, setKnowledgeStates] = useState({});
 
   // Effect to load book if viewing
@@ -37,6 +38,7 @@ function CreateBookPage() {
             setResult(book.hierarchy);
             setText(book.sourceText || '');
             setIsViewing(true);
+            fetchRecommendation(book.hierarchy);
           }
         } catch (err) {
           toast.error('Failed to load book mapping');
@@ -47,8 +49,25 @@ function CreateBookPage() {
       setResult(null);
       setText('');
       setIsViewing(false);
+      setRecommendation(null);
     }
   }, [id]);
+
+  const fetchRecommendation = async (hierarchy) => {
+    const userString = localStorage.getItem('thinkmap_user');
+    if (!userString) return;
+    const user = JSON.parse(userString);
+    
+    try {
+      const data = await mlApi.post('/recommend-concept', {
+        userId: user.id,
+        hierarchy
+      });
+      if (data.concept) setRecommendation(data);
+    } catch (err) {
+      console.error('Failed to fetch recommendation:', err);
+    }
+  };
 
   // Fetch knowledge states
   const fetchKnowledgeStates = async () => {
@@ -168,15 +187,32 @@ function CreateBookPage() {
     }
   };
 
+  const handleRecommendationClick = () => {
+    if (recommendation?.concept) {
+      setSelectedConcept(recommendation.concept);
+    }
+  };
+
+  const openContextualTutor = () => {
+    const mainTopic = result ? Object.keys(result)[0] : 'this topic';
+    window.dispatchEvent(new CustomEvent('tutor-activate', { 
+      detail: { 
+        concept: mainTopic, 
+        explanation: `I'm studying ${mainTopic}. Can you help me understand the key connections in this mastery map?` 
+      } 
+    }));
+  };
+
   const handleQuizClose = () => {
     setSelectedConcept(null);
     fetchKnowledgeStates();
+    if (result) fetchRecommendation(result);
   };
 
   return (
     <div className="create-book-page">
       <header style={{ marginBottom: '2.5rem' }}>
-        <div style={{ marginBottom: '0.5rem', color: '#38bdf8', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <div style={{ marginBottom: '0.5rem', color: '#ffffff', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           AI Content Lab
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
@@ -186,22 +222,22 @@ function CreateBookPage() {
           </div>
           
           {isViewing && (
-            <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#0f172a', padding: '0.4rem', borderRadius: '12px', border: '1px solid #1e293b' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#18181b', padding: '0.4rem', borderRadius: '12px', border: '1px solid #27272a' }}>
               <button 
                 onClick={() => setViewMode('map')}
                 style={{
                   padding: '0.5rem 1.25rem',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: viewMode === 'map' ? '#38bdf8' : 'transparent',
-                  color: viewMode === 'map' ? '#000' : '#9ca3af',
+                  backgroundColor: viewMode === 'map' ? '#ffffff' : 'transparent',
+                  color: viewMode === 'map' ? '#000' : '#71717a',
                   fontSize: '0.85rem',
                   fontWeight: 'bold',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
               >
-                🗺️ Mastery Map
+                Mastery Map
               </button>
               <button 
                 onClick={() => setViewMode('notes')}
@@ -209,15 +245,15 @@ function CreateBookPage() {
                   padding: '0.5rem 1.25rem',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: viewMode === 'notes' ? '#38bdf8' : 'transparent',
-                  color: viewMode === 'notes' ? '#000' : '#9ca3af',
+                  backgroundColor: viewMode === 'notes' ? '#ffffff' : 'transparent',
+                  color: viewMode === 'notes' ? '#000' : '#71717a',
                   fontSize: '0.85rem',
                   fontWeight: 'bold',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
               >
-                📝 View Notes
+                View Notes
               </button>
             </div>
           )}
@@ -226,14 +262,14 @@ function CreateBookPage() {
 
       <main className="layout" style={{ display: 'grid', gridTemplateColumns: (result && !isViewing) ? '0.8fr 2.2fr' : '1fr', gap: '2rem' }}>
         {!isViewing && (
-          <section className="panel" style={{ border: '1px solid #1e293b', background: 'linear-gradient(145deg, #0f172a 0%, #020617 100%)' }}>
+          <section className="panel" style={{ border: '1px solid #27272a', background: 'linear-gradient(145deg, #09090b 0%, #18181b 100%)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 style={{ margin: 0 }}>Input Content</h2>
-              <span style={{ fontSize: '0.75rem', backgroundColor: '#38bdf820', color: '#38bdf8', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontWeight: 'bold' }}>Multi-Modal AI</span>
+              <span style={{ fontSize: '0.75rem', backgroundColor: '#ffffff10', color: '#ffffff', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontWeight: 'bold' }}>Multi-Modal AI</span>
             </div>
 
             <div style={{ marginBottom: '2rem' }}>
-               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '1rem', textTransform: 'uppercase' }}>Option 1: Paste Text</h3>
+               <h3 style={{ fontSize: '0.9rem', color: '#71717a', marginBottom: '1rem', textTransform: 'uppercase' }}>Option 1: Paste Text</h3>
                <form onSubmit={handleSubmitText} className="form">
                 <textarea
                   value={text}
@@ -242,15 +278,35 @@ function CreateBookPage() {
                   rows={6}
                   style={{ marginBottom: '1rem' }}
                 />
-                <button type="submit" disabled={loading || !!file} style={{ width: '100%', padding: '0.75rem', fontWeight: 'bold' }}>
+                <button 
+                  type="submit" 
+                  disabled={loading || !!file} 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.75rem', 
+                    fontWeight: 'bold',
+                    backgroundColor: '#18181b',
+                    color: '#ffffff',
+                    border: '1px solid #27272a',
+                    borderRadius: '9999px',
+                    transition: 'all 0.2s',
+                    cursor: (loading || !!file) ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading && !file) e.currentTarget.style.backgroundColor = '#27272a';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading && !file) e.currentTarget.style.backgroundColor = '#18181b';
+                  }}
+                >
                   {loading && !file ? 'Analyzing Text...' : 'Generate from Text'}
                 </button>
               </form>
             </div>
 
-            <div style={{ padding: '1.5rem', border: '2px dashed #1e293b', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.05)' }}>
-               <h3 style={{ fontSize: '0.9rem', color: '#38bdf8', marginBottom: '1rem', textTransform: 'uppercase' }}>Option 2: Upload Files</h3>
-               <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem' }}>Support for PDF, Images (PNG/JPG), and DOCX</p>
+            <div style={{ padding: '1.5rem', border: '2px dashed #27272a', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.02)' }}>
+               <h3 style={{ fontSize: '0.9rem', color: '#ffffff', marginBottom: '1rem', textTransform: 'uppercase' }}>Option 2: Upload Files</h3>
+               <p style={{ fontSize: '0.8rem', color: '#71717a', marginBottom: '1rem' }}>Support for PDF, Images (PNG/JPG), and DOCX</p>
                
                <input 
                  type="file" 
@@ -258,14 +314,14 @@ function CreateBookPage() {
                  onChange={(e) => setFile(e.target.files[0])}
                  style={{ 
                    marginBottom: '1rem',
-                   color: '#9ca3af',
+                   color: '#71717a',
                    fontSize: '0.85rem'
                  }}
                />
                
                {file && (
-                 <div style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#0f172a', borderRadius: '6px', fontSize: '0.85rem' }}>
-                   Selected: <span style={{ color: '#38bdf8' }}>{file.name}</span> ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                 <div style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#18181b', borderRadius: '6px', fontSize: '0.85rem' }}>
+                   Selected: <span style={{ color: '#ffffff' }}>{file.name}</span> ({(file.size / 1024 / 1024).toFixed(2)} MB)
                  </div>
                )}
 
@@ -276,8 +332,8 @@ function CreateBookPage() {
                   width: '100%', 
                   padding: '0.75rem', 
                   fontWeight: 'bold',
-                  backgroundColor: file ? '#38bdf8' : '#1e293b',
-                  color: file ? '#000' : '#64748b'
+                  backgroundColor: file ? '#ffffff' : '#27272a',
+                  color: file ? '#000' : '#71717a'
                 }}>
                   {loading && file ? 'Processing File...' : 'Generate from File'}
                </button>
@@ -286,13 +342,75 @@ function CreateBookPage() {
         )}
 
         {result && (
-          <section className="panel" style={{ padding: '0', overflow: 'hidden', border: '1px solid #1e293b', background: 'transparent' }}>
+          <section className="panel" style={{ padding: '0', overflow: 'hidden', border: '1px solid #27272a', background: 'transparent' }}>
             {viewMode === 'map' ? (
               <div style={{ padding: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                   <h2 style={{ margin: 0 }}>Mastery Map</h2>
-                  <p style={{ fontSize: '0.8rem', color: '#9ca3af', margin: 0 }}>Click on nodes to practice</p>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <button 
+                      onClick={openContextualTutor}
+                      style={{
+                        padding: '0.4rem 1rem',
+                        borderRadius: '8px',
+                        backgroundColor: '#18181b',
+                        color: '#f8fafc',
+                        border: '1px solid #27272a',
+                        fontSize: '0.85rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      Ask Tutor
+                    </button>
+                    <p style={{ fontSize: '0.8rem', color: '#71717a', margin: 0 }}>Click on nodes to practice</p>
+                  </div>
                 </div>
+
+                {recommendation && (
+                  <div 
+                    onClick={handleRecommendationClick}
+                    style={{ 
+                      marginBottom: '1.5rem', 
+                      padding: '1rem 1.5rem', 
+                      backgroundColor: recommendation.priority === 'high' ? '#ef444410' : '#18181b', 
+                      borderRadius: '12px', 
+                      border: `1px solid ${recommendation.priority === 'high' ? '#ef444420' : '#27272a'}`,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = recommendation.priority === 'high' ? '#ef4444' : '#ffffff20'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = recommendation.priority === 'high' ? '#ef444420' : '#27272a'}
+                  >
+                    <div style={{ 
+                      fontSize: '1rem', 
+                      backgroundColor: '#ffffff05', 
+                      padding: '0.4rem', 
+                      borderRadius: '10px',
+                      color: '#ffffff'
+                    }}>
+                      NEXT
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: recommendation.priority === 'high' ? '#f87171' : '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
+                        Next Best Concept
+                      </div>
+                      <div style={{ fontSize: '1rem', fontWeight: '600', color: '#ffffff' }}>
+                        {recommendation.concept}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: '#71717a' }}>
+                        {recommendation.reason}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <ConceptGraph 
                   data={result} 
                   onSelectNode={handleConceptSelect} 

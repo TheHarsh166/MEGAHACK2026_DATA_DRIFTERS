@@ -1,7 +1,8 @@
 :root {
-  --primary: #6366f1;
-  --bg: #0f172a;
-  --card-bg: #1e293b;
+  --primary: #3f3f46; /* Zinc 700 */
+  --bg: #09090b; /* Zinc 950 */
+  --card-bg: #18181b; /* Zinc 900 */
+  --accent: #27272a; /* Zinc 800 */
   --text: #f8fafc;
   --text-dim: #94a3b8;
   --success: #22c55e;
@@ -28,7 +29,8 @@ body {
   font-size: 2.5rem;
   background: linear-gradient(to right, #818cf8, #c084fc);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
   margin-bottom: 3rem;
 }
 

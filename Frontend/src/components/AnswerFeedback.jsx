@@ -3,6 +3,7 @@ import React from 'react';
 /**
  * AnswerFeedback
  * Displays the result of Gemini's answer evaluation.
+ * Strictly neutral theme (Zinc/Black/White/Grey).
  */
 function AnswerFeedback({ result }) {
   if (!result) return null;
@@ -10,50 +11,51 @@ function AnswerFeedback({ result }) {
   const { score, result: status, feedback, misconception, recommendations } = result;
 
   const getBackgroundColor = () => {
-    if (status === 'correct') return '#064e3b20';
-    if (status === 'partial') return '#78350f20';
-    return '#450a0a20';
+    if (status === 'correct') return 'rgba(255, 255, 255, 0.05)';
+    if (status === 'partial') return 'rgba(161, 161, 170, 0.05)';
+    return 'rgba(63, 63, 70, 0.05)';
   };
 
   const getBorderColor = () => {
-    if (status === 'correct') return '#064e3b';
-    if (status === 'partial') return '#78350f';
-    return '#b91c1c';
+    if (status === 'correct') return '#ffffff';
+    if (status === 'partial') return '#a1a1aa';
+    return '#3f3f46';
   };
 
   const getTextColor = () => {
-    if (status === 'correct') return '#4ade80';
-    if (status === 'partial') return '#fbbf24';
-    return '#f87171';
+    if (status === 'correct') return '#ffffff';
+    if (status === 'partial') return '#e4e4e7';
+    return '#a1a1aa';
   };
 
   return (
     <div style={{
-      padding: '1rem',
-      borderRadius: '8px',
+      padding: '1.25rem',
+      borderRadius: '12px',
       border: '1px solid',
-      marginTop: '1rem',
+      marginTop: '1.5rem',
       textAlign: 'left',
       backgroundColor: getBackgroundColor(),
       borderColor: getBorderColor(),
-      color: getTextColor()
+      color: getTextColor(),
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <h3 style={{ margin: 0, textTransform: 'capitalize', fontSize: '1.1rem' }}>{status}</h3>
-        <span style={{ fontWeight: 'bold' }}>Score: {Math.round(score * 100)}%</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        <h3 style={{ margin: 0, textTransform: 'uppercase', fontSize: '0.9rem', fontWeight: '800', letterSpacing: '0.05em' }}>{status}</h3>
+        <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#ffffff' }}>SCORE: {Math.round(score * 100)}%</span>
       </div>
-      <p style={{ margin: '0 0 1rem 0', fontSize: '0.95rem', lineHeight: '1.4', color: '#e5e7eb' }}>{feedback}</p>
+      <p style={{ margin: '0 0 1.25rem 0', fontSize: '0.9rem', lineHeight: '1.6', color: '#d4d4d8' }}>{feedback}</p>
       
       {result.correctAnswer && (
         <div style={{ 
-          marginTop: '1rem', 
-          padding: '0.75rem', 
-          backgroundColor: 'rgba(56, 189, 248, 0.1)', 
-          border: '1px solid rgba(56, 189, 248, 0.2)', 
-          borderRadius: '6px' 
+          marginTop: '1.25rem', 
+          padding: '1rem', 
+          backgroundColor: '#18181b', 
+          border: '1px solid #27272a', 
+          borderRadius: '8px' 
         }}>
-          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#38bdf8' }}>Correct Answer</h4>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: '#f9fafb', fontWeight: '500' }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 'bold' }}>Correct Answer</h4>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: '#ffffff', fontWeight: '500' }}>
             {result.correctAnswer}
           </p>
         </div>
@@ -61,57 +63,57 @@ function AnswerFeedback({ result }) {
 
       {misconception && misconception.misconception_detected && (
         <div style={{ 
-          marginTop: '1rem', 
-          padding: '0.75rem', 
-          backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-          border: '1px solid rgba(239, 68, 68, 0.2)', 
-          borderRadius: '6px' 
+          marginTop: '1.25rem', 
+          padding: '1rem', 
+          backgroundColor: '#09090b', 
+          border: '1px dashed #3f3f46', 
+          borderRadius: '8px' 
         }}>
-          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#f87171' }}>Detected Misconception</h4>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: '#fca5a5' }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#f87171', textTransform: 'uppercase', fontWeight: 'bold' }}>Analysis</h4>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: '#d4d4d8' }}>
             {misconception.explanation}
           </p>
         </div>
       )}
 
       {recommendations && recommendations.length > 0 && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: '#38bdf8' }}>Recommended Resources</h4>
+        <div style={{ marginTop: '1.75rem' }}>
+          <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 'bold' }}>Recommended Learning</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {recommendations.slice(0, 3).map((rec, i) => (
               <div key={i} style={{ 
-                padding: '0.75rem', 
-                backgroundColor: 'rgba(56, 189, 248, 0.05)', 
-                border: '1px solid rgba(56, 189, 248, 0.1)', 
-                borderRadius: '6px',
-                position: 'relative'
+                padding: '1rem', 
+                backgroundColor: '#18181b', 
+                border: '1px solid #27272a', 
+                borderRadius: '8px',
+                position: 'relative',
+                transition: 'all 0.2s'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#f9fafb', marginBottom: '0.25rem' }}>{rec.title}</div>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#ffffff', marginBottom: '0.25rem' }}>{rec.title}</div>
                   {rec.url && (
                     <a 
                       href={rec.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       style={{
-                        padding: '0.2rem 0.5rem',
+                        padding: '0.3rem 0.75rem',
                         fontSize: '0.7rem',
-                        backgroundColor: rec.type === 'Video' ? '#ef4444' : '#1e293b',
-                        color: '#fff',
-                        borderRadius: '4px',
+                        backgroundColor: '#27272a',
+                        color: '#ffffff',
+                        borderRadius: '6px',
                         textDecoration: 'none',
-                        fontWeight: '600',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em'
                       }}
                     >
-                      {rec.type === 'Video' ? '▶ Watch' : '🔗 View'}
+                      {rec.type === 'Video' ? 'WATCH' : 'VIEW'}
                     </a>
                   )}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{rec.type} • {rec.difficulty}</div>
-                <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '0.4rem' }}>{rec.content_preview}</div>
+                <div style={{ fontSize: '0.7rem', color: '#71717a', textTransform: 'uppercase', fontWeight: 'bold' }}>{rec.type} • {rec.difficulty}</div>
+                <div style={{ fontSize: '0.8rem', color: '#a1a1aa', marginTop: '0.5rem' }}>{rec.content_preview}</div>
               </div>
             ))}
           </div>

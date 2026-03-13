@@ -4,11 +4,12 @@ import React, { useMemo } from 'react';
  * PlantProgress Component
  * Visualizes progress through a growing plant animation.
  * 
+ * @param {boolean} loading - Whether the component is in a loading state
  * @param {number} completed - Number of completed tasks/concepts
  * @param {number} total - Total number of tasks/concepts
  * @param {string} label - Label for the concept/category
  */
-const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) => {
+const PlantProgress = ({ loading = false, completed = 0, total = 10, label = "Learning Path" }) => {
   const progress = total > 0 ? Math.min(completed / total, 1) : 0;
   const percentage = Math.round(progress * 100);
   
@@ -19,7 +20,7 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
   const plantStages = useMemo(() => [
     // Stage 0: Seed (just dirt/pot)
     <g key="s0" className="stage-0">
-      <circle cx="50" cy="75" r="3" fill="#22c55e" opacity="0.6" />
+      <circle cx="50" cy="75" r="3" fill="#ffffff" opacity="0.6" />
     </g>,
     // Stage 1: Sprout
     <g key="s1" className="stage-1">
@@ -37,7 +38,7 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
       <path d="M50 75 L50 40" stroke="#22c55e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <path d="M50 55 Q40 50 38 55" fill="#22c55e" />
       <path d="M50 45 Q60 40 62 45" fill="#22c55e" />
-      <circle cx="50" cy="38" r="6" fill="#16a34a" />
+      <circle cx="50" cy="38" r="6" fill="#d1d5db" />
     </g>,
     // Stage 4: Bloom
     <g key="s4" className="stage-4">
@@ -45,18 +46,18 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
       <path d="M50 60 Q35 55 33 60" fill="#22c55e" />
       <path d="M50 50 Q65 45 67 50" fill="#22c55e" />
       {/* Flower petals */}
-      <circle cx="50" cy="30" r="10" fill="#16a34a" />
-      <circle cx="50" cy="22" r="6" fill="#86efac" />
-      <circle cx="50" cy="38" r="6" fill="#86efac" />
-      <circle cx="42" cy="30" r="6" fill="#86efac" />
-      <circle cx="58" cy="30" r="10" fill="#86efac" opacity="0.8" />
-      <circle cx="50" cy="30" r="4" fill="#facc15" />
+      <circle cx="50" cy="30" r="10" fill="#d1d5db" />
+      <circle cx="50" cy="22" r="6" fill="#e5e7eb" />
+      <circle cx="50" cy="38" r="6" fill="#e5e7eb" />
+      <circle cx="42" cy="30" r="6" fill="#e5e7eb" />
+      <circle cx="58" cy="30" r="10" fill="#e5e7eb" opacity="0.8" />
+      <circle cx="50" cy="30" r="4" fill="#f9fafb" />
       {/* Sparkles */}
       <g className="sparkles">
-        <circle cx="20" cy="20" r="1.5" fill="#facc15" />
-        <circle cx="80" cy="25" r="1" fill="#facc15" />
-        <circle cx="30" cy="40" r="1" fill="#facc15" />
-        <circle cx="70" cy="15" r="1.5" fill="#facc15" />
+        <circle cx="20" cy="20" r="1.5" fill="#f9fafb" />
+        <circle cx="80" cy="25" r="1" fill="#f9fafb" />
+        <circle cx="30" cy="40" r="1" fill="#f9fafb" />
+        <circle cx="70" cy="15" r="1.5" fill="#f9fafb" />
       </g>
     </g>
   ], []);
@@ -67,9 +68,9 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
       flexDirection: 'column',
       alignItems: 'center',
       padding: '1.5rem',
-      backgroundColor: '#0f172a',
+      backgroundColor: '#09090b',
       borderRadius: '16px',
-      border: '1px solid #1e293b',
+      border: '1px solid #27272a',
       width: '240px',
       transition: 'transform 0.3s ease',
       cursor: 'default'
@@ -104,23 +105,30 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
           `}</style>
           
           {/* Pot */}
-          <path d="M30 75 L70 75 L65 95 L35 95 Z" fill="#d97706" />
-          <rect x="25" y="75" width="50" height="5" rx="2" fill="#b45309" />
+          <path d="M30 75 L70 75 L65 95 L35 95 Z" fill="#52525b" />
+          <rect x="25" y="75" width="50" height="5" rx="2" fill="#3f3f46" />
           
           {/* Plant Stages */}
-          {plantStages.slice(0, stage + 1)}
+          {loading ? (
+            /* Special loading animation that grows from small to large */
+            <g className="growth-loop">
+              {plantStages[4]} {/* Show the full-size plant for the growth animation */}
+            </g>
+          ) : (
+            plantStages.slice(0, stage + 1)
+          )}
         </svg>
       </div>
 
       <div style={{ width: '100%', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 'bold' }}>{label}</span>
-          <span style={{ fontSize: '0.8rem', color: '#22c55e' }}>{percentage}%</span>
+          <span style={{ fontSize: '0.8rem', color: '#71717a', fontWeight: 'bold' }}>{label}</span>
+          <span style={{ fontSize: '0.8rem', color: '#ffffff' }}>{percentage}%</span>
         </div>
         <div style={{ 
           width: '100%', 
           height: '6px', 
-          backgroundColor: '#1e293b', 
+          backgroundColor: '#27272a', 
           borderRadius: '3px',
           overflow: 'hidden'
         }}>

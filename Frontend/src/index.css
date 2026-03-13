@@ -5,7 +5,7 @@
 
   color-scheme: dark;
   color: #f9fafb;
-  background-color: #020617;
+  background-color: #09090b;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,16 +17,16 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #020617;
+  background-color: #09090b;
   color: #f9fafb;
 }
 
 a {
   font-weight: 500;
-  color: #38bdf8;
+  color: #ffffff;
   text-decoration: none;
 }
 
 a:hover {
-  color: #0ea5e9;
+  color: #9ca3af;
 }
