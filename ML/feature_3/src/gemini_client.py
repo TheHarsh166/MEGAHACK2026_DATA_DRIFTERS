@@ -18,7 +18,7 @@ class GeminiQuizClient:
             raise RuntimeError("GEMINI_API_KEY environment variable is not set.")
 
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-flash-latest"
+        self.model = "gemini-2.5-flash"
 
     def generate_questions(self, concept: str, max_retries: int = 1) -> str:
         prompt = (

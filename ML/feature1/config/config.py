@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = Field(..., env="GEMINI_API_KEY")
     # Force a known-good model name and IGNORE any GEMINI_MODEL env override
     # to avoid conflicts from global environment settings.
-    gemini_model: str = Field("gemini-flash-latest")
+    gemini_model: str = Field("gemini-2.5-flash")
 
     ocr_engine: str = Field("pytesseract", env="OCR_ENGINE")
     easyocr_langs: str = Field("en", env="EASYOCR_LANGS")

@@ -42,11 +42,11 @@ class GeminiRecommendationEngine:
                 # Prefer old API (google.generativeai) as it's more stable
                 if USE_NEW_API is False:
                     google_genai.configure(api_key=self.gemini_api_key)
-                    self.model_name = "gemini-flash-latest"
+                    self.model_name = "gemini-2.5-flash"
                     self.client = None  # Old API doesn't use client
                 elif USE_NEW_API:
                     self.client = google_genai.Client(api_key=self.gemini_api_key)
-                    self.model_name = "gemini-flash-latest"
+                    self.model_name = "gemini-2.5-flash"
                 else:
                     self.client = None
             except Exception as e:
@@ -76,7 +76,7 @@ class GeminiRecommendationEngine:
             # For new API, try to list available models first
             try:
                 # Try common model names for new API
-                model_names = ["gemini-flash-latest", "gemini-pro-latest", "gemini-3-flash-preview"]
+                model_names = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest"]
                 for model_name in model_names:
                     try:
                         response = self.client.models.generate_content(
