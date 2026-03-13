@@ -19,37 +19,37 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
   const plantStages = useMemo(() => [
     // Stage 0: Seed (just dirt/pot)
     <g key="s0" className="stage-0">
-      <circle cx="50" cy="75" r="3" fill="#38bdf8" opacity="0.6" />
+      <circle cx="50" cy="75" r="3" fill="#22c55e" opacity="0.6" />
     </g>,
     // Stage 1: Sprout
     <g key="s1" className="stage-1">
-      <path d="M50 75 Q48 65 52 60" stroke="#38bdf8" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M52 60 Q58 58 60 62" fill="#38bdf8" />
+      <path d="M50 75 Q48 65 52 60" stroke="#22c55e" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M52 60 Q58 58 60 62" fill="#22c55e" />
     </g>,
     // Stage 2: Growing
     <g key="s2" className="stage-2">
-      <path d="M50 75 Q50 60 50 50" stroke="#38bdf8" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M50 65 Q40 60 38 65" fill="#38bdf8" />
-      <path d="M50 55 Q60 50 62 55" fill="#38bdf8" />
+      <path d="M50 75 Q50 60 50 50" stroke="#22c55e" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M50 65 Q40 60 38 65" fill="#22c55e" />
+      <path d="M50 55 Q60 50 62 55" fill="#22c55e" />
     </g>,
     // Stage 3: Bud
     <g key="s3" className="stage-3">
-      <path d="M50 75 L50 40" stroke="#38bdf8" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <path d="M50 55 Q40 50 38 55" fill="#38bdf8" />
-      <path d="M50 45 Q60 40 62 45" fill="#38bdf8" />
-      <circle cx="50" cy="38" r="6" fill="#0ea5e9" />
+      <path d="M50 75 L50 40" stroke="#22c55e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M50 55 Q40 50 38 55" fill="#22c55e" />
+      <path d="M50 45 Q60 40 62 45" fill="#22c55e" />
+      <circle cx="50" cy="38" r="6" fill="#16a34a" />
     </g>,
     // Stage 4: Bloom
     <g key="s4" className="stage-4">
-      <path d="M50 75 L50 35" stroke="#38bdf8" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <path d="M50 60 Q35 55 33 60" fill="#38bdf8" />
-      <path d="M50 50 Q65 45 67 50" fill="#38bdf8" />
+      <path d="M50 75 L50 35" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M50 60 Q35 55 33 60" fill="#22c55e" />
+      <path d="M50 50 Q65 45 67 50" fill="#22c55e" />
       {/* Flower petals */}
-      <circle cx="50" cy="30" r="10" fill="#0ea5e9" />
-      <circle cx="50" cy="22" r="6" fill="#7dd3fc" />
-      <circle cx="50" cy="38" r="6" fill="#7dd3fc" />
-      <circle cx="42" cy="30" r="6" fill="#7dd3fc" />
-      <circle cx="58" cy="30" r="10" fill="#7dd3fc" opacity="0.8" />
+      <circle cx="50" cy="30" r="10" fill="#16a34a" />
+      <circle cx="50" cy="22" r="6" fill="#86efac" />
+      <circle cx="50" cy="38" r="6" fill="#86efac" />
+      <circle cx="42" cy="30" r="6" fill="#86efac" />
+      <circle cx="58" cy="30" r="10" fill="#86efac" opacity="0.8" />
       <circle cx="50" cy="30" r="4" fill="#facc15" />
       {/* Sparkles */}
       <g className="sparkles">
@@ -115,7 +115,7 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
       <div style={{ width: '100%', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
           <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 'bold' }}>{label}</span>
-          <span style={{ fontSize: '0.8rem', color: '#38bdf8' }}>{percentage}%</span>
+          <span style={{ fontSize: '0.8rem', color: '#22c55e' }}>{percentage}%</span>
         </div>
         <div style={{ 
           width: '100%', 
@@ -127,8 +127,8 @@ const PlantProgress = ({ completed = 0, total = 10, label = "Learning Path" }) =
           <div style={{ 
             width: `${percentage}%`, 
             height: '100%', 
-            backgroundColor: '#38bdf8', 
-            boxShadow: '0 0 10px #38bdf880',
+            backgroundColor: '#22c55e', 
+            boxShadow: '0 0 10px #22c55e80',
             transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)'
           }}></div>
         </div>

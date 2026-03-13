@@ -122,41 +122,56 @@ async def process_student_answer(
     student_attempts_collection.insert_one(attempt_doc)
     print(f"[KnowledgeService] Stored attempt for user {user_id}, question {question_id}, points {points}")
     
-    # 7. Update student_knowledge collection with summative logic
+    # 7. Update student_knowledge collection with summative logic & points
+    # Points: +10 correct, -10 incorrect, +5 partial
+    if new_state == "green": points = 10
+    elif new_state == "yellow": points = 5
+    else: points = -10
+
     # Fetch last 3 attempts for this concept to determine aggregate state
     recent_attempts = list(student_attempts_collection.find(
         {"userId": user_id, "conceptId": concept_id}
     ).sort("timestamp", -1).limit(3))
     
-    # Summative rules:
-    # 1. If all 3 are 'green' -> GREEN on graph
-    # 2. If all 3 are 'red' -> RED on graph
-    # 3. If all 3 are 'yellow' -> YELLOW on graph
-    # 4. Mixed: use weighted consensus (default to yellow if mixed)
-    
     states = [a.get("state") for a in recent_attempts]
     
     if len(states) < 3:
-        # Not enough history yet, use current state
         summative_graph_state = new_state
     else:
-        if all(s == "green" for s in states):
-            summative_graph_state = "green"
-        elif all(s == "red" for s in states):
-            summative_graph_state = "red"
-        elif all(s == "yellow" for s in states):
-            summative_graph_state = "yellow"
-        else:
-            # Mixed distribution logic
-            green_count = states.count("green")
-            red_count = states.count("red")
-            if green_count >= 2: summative_graph_state = "green"
-            elif red_count >= 2: summative_graph_state = "red"
-            else: summative_graph_state = "yellow"
-        
+        green_count = states.count("green")
+        red_count = states.count("red")
+        if green_count >= 2: summative_graph_state = "green"
+        elif red_count >= 2: summative_graph_state = "red"
+        else: summative_graph_state = "yellow"
+    
+    # Update cumulative stats and streak
+    now = datetime.utcnow()
+    knowledge_doc = student_knowledge_collection.find_one({"userId": user_id})
+    current_points = (knowledge_doc.get("points", 0) if knowledge_doc else 0) + points
+    current_streak = knowledge_doc.get("streak", 0) if knowledge_doc else 0
+    last_activity = knowledge_doc.get("lastActivity") if knowledge_doc else None
+    
+    # Streak logic: if last activity was yesterday, increment. If today, same. Else, reset.
+    if last_activity:
+        days_diff = (now.date() - last_activity.date()).days
+        if days_diff == 1:
+            current_streak += 1
+        elif days_diff > 1:
+            current_streak = 1 # reset
+    else:
+        current_streak = 1
+
     student_knowledge_collection.update_one(
         {"userId": user_id},
-        {"$set": {f"conceptStates.{concept_id}": summative_graph_state}},
+        {
+            "$set": {
+                f"conceptStates.{concept_id}": summative_graph_state,
+                "points": max(0, current_points),
+                "streak": current_streak,
+                "lastActivity": now
+            },
+            "$inc": { "totalQuestionsSolved": 1 }
+        },
         upsert=True
     )
     

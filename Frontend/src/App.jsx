@@ -7,6 +7,7 @@ import Signup from './components/Signup.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import CreateBookPage from './pages/CreateBookPage.jsx'
+import ProgressPage from './pages/ProgressPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 
 function App() {
@@ -27,10 +28,6 @@ function App() {
     localStorage.removeItem('thinkmap_token')
     localStorage.removeItem('thinkmap_user')
     setUser(null)
-  }
-
-  const addBook = (newBook) => {
-    // Books are now managed via API in pages
   }
 
   return (
@@ -62,6 +59,7 @@ function App() {
                   <Routes>
                     <Route path="/dashboard" element={<DashboardPage user={user} />} />
                     <Route path="/create-book" element={<CreateBookPage />} />
+                    <Route path="/progress" element={<ProgressPage user={user} />} />
                     <Route path="/book/:id" element={<CreateBookPage />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                   </Routes>

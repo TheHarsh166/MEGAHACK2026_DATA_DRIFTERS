@@ -61,6 +61,23 @@ function Sidebar({ user, onLogout }) {
           >
             Create Book
           </button>
+          <button 
+            onClick={() => navigate('/progress')}
+            style={{
+              textAlign: 'left',
+              padding: '0.75rem 1rem',
+              borderRadius: '8px',
+              backgroundColor: isActive('/progress') ? '#1e293b' : 'transparent',
+              color: isActive('/progress') ? '#f9fafb' : '#9ca3af',
+              border: 'none',
+              fontSize: '1rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+          >
+            Progress
+          </button>
         </nav>
       </div>
 
