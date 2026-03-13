@@ -43,120 +43,98 @@ function DashboardPage({ user }) {
   return (
     <div className="dashboard-page">
       <header style={{ marginBottom: '2.5rem' }}>
-        <div style={{ marginBottom: '0.5rem', color: '#38bdf8', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <div style={{ marginBottom: '0.5rem', color: '#ffffff', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Overview
         </div>
         <h1>Welcome, {user?.name || user?.email.split('@')[0]}</h1>
         <p>Ready to master new concepts today?</p>
       </header>
 
-      {/* Growth Progress Section */}
-      <section style={{ marginBottom: '3rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '1.5rem' }}>🌱</div>
-          <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Knowledge Growth</h2>
-          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #1e293b, transparent)' }}></div>
-        </div>
-        
-        <div style={{ 
-          display: 'flex', 
-          gap: '1.5rem', 
-          overflowX: 'auto', 
-          padding: '0.5rem 0.5rem 1.5rem 0.5rem',
-          scrollbarWidth: 'none'
-        }}>
-          <PlantProgress 
-            completed={masteredConcepts} 
-            total={totalConcepts} 
-            label="Mastered Concepts" 
-          />
-          <PlantProgress 
-            completed={masteredConcepts + inProgressConcepts} 
-            total={totalConcepts} 
-            label="Overall Learning" 
-          />
-        </div>
-      </section>
+
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Your Study Books</h2>
-        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #1e293b, transparent)' }}></div>
+        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #27272a, transparent)' }}></div>
       </div>
 
-      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-        {/* Create Book Card */}
-        <div 
-          onClick={() => navigate('/create-book')}
-          className="panel" 
-          style={{ 
-            cursor: 'pointer',
-            border: '1px dashed #38bdf8', 
-            background: 'transparent',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '2.5rem 2rem',
-            textAlign: 'center',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#38bdf810';
-            e.currentTarget.style.transform = 'translateY(-5px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>+</div>
-          <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Create New Book</h2>
-          <p style={{ color: '#9ca3af', fontSize: '0.85rem', margin: 0 }}>Start a new AI session</p>
-        </div>
-
-        {/* Saved Book Cards */}
-        {loading ? (
-          <div style={{ color: '#9ca3af' }}>Loading your cloud library...</div>
-        ) : books.map((book) => (
+      <div className="dashboard-scroll-area">
+        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem', paddingBottom: '2rem' }}>
+          {/* Create Book Card */}
           <div 
-            key={book._id || book.id}
-            onClick={() => navigate(`/book/${book._id || book.id}`)}
+            onClick={() => navigate('/create-book')}
             className="panel" 
             style={{ 
               cursor: 'pointer',
-              border: '1px solid #1e293b', 
-              background: 'linear-gradient(145deg, #0f172a 0%, #020617 100%)',
-              padding: '2rem',
-              position: 'relative',
+              border: '1px dashed #27272a', 
+              background: 'transparent',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '2.5rem 2rem',
+              textAlign: 'center',
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#38bdf8';
+              e.currentTarget.style.backgroundColor = '#ffffff05';
               e.currentTarget.style.transform = 'translateY(-5px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#1e293b';
+              e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <div style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-              STUDY BOOK
-            </div>
-            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {book.title}
-            </h2>
-            <div style={{ color: '#9ca3af', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>{book.date}</span>
-              <span style={{ color: '#38bdf8' }}>View Map →</span>
-            </div>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem', color: '#71717a' }}>+</div>
+            <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Create New Book</h2>
+            <p style={{ color: '#71717a', fontSize: '0.85rem', margin: 0 }}>Start a new AI session</p>
           </div>
-        ))}
 
-        {books.length === 0 && !loading && (
-          <div className="panel" style={{ border: '1px solid #1e293b', background: '#020617', opacity: 0.5, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
-            <p style={{ color: '#9ca3af', textAlign: 'center' }}>You haven't created any study books yet. Click the "+" card to start.</p>
-          </div>
-        )}
+          {/* Saved Book Cards */}
+          {loading ? (
+            [...Array(3)].map((_, i) => (
+              <div key={`skeleton-${i}`} className="skeleton-card skeleton-shimmer"></div>
+            ))
+          ) : books.map((book) => (
+            <div 
+              key={book._id || book.id}
+              onClick={() => navigate(`/book/${book._id || book.id}`)}
+              className="panel" 
+              style={{ 
+                cursor: 'pointer',
+                border: '1px solid #27272a', 
+                background: '#09090b',
+                padding: '2rem',
+                position: 'relative',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#3f3f46';
+                e.currentTarget.style.transform = 'translateY(-5px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#27272a';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <div style={{ color: '#ffffff40', fontSize: '0.7rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '0.1em' }}>
+                STUDY BOOK
+              </div>
+              <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {book.title}
+              </h2>
+              <div style={{ color: '#71717a', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{book.date}</span>
+                <span style={{ color: '#ffffff60' }}>View Map</span>
+              </div>
+            </div>
+          ))}
+
+          {books.length === 0 && !loading && (
+            <div className="panel" style={{ border: '1px solid #27272a', background: '#09090b', opacity: 0.5, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+              <p style={{ color: '#71717a', textAlign: 'center' }}>You haven't created any study books yet. Click the "+" card to start.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

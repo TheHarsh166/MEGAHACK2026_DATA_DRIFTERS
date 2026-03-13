@@ -152,31 +152,25 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
   };
 
   return (
-    <div className="question-card" style={{
-      padding: '1.5rem',
-      backgroundColor: '#0f172a',
+    <div style={{
+      marginTop: '1.5rem',
+      padding: '1.25rem',
+      backgroundColor: '#18181b',
       borderRadius: '12px',
-      marginBottom: '1.5rem',
-      border: '1px solid #1e293b',
+      border: '1px solid #27272a',
       textAlign: 'left'
     }}>
-      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-            <span style={{ 
-            fontSize: '0.75rem', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.05em', 
-            color: '#38bdf8',
-            fontWeight: 'bold'
-            }}>
-            Question {index + 1} — {questionData.type}
-            </span>
-            <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem', color: '#f9fafb' }}>{questionData.question}</h3>
-        </div>
-        <div style={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'right' }}>
-            <div>Time: {timeSpent}s</div>
-            <div>Attempts: {attempts}</div>
-        </div>
+      <div style={{ marginBottom: '1rem' }}>
+        <span style={{ 
+          fontSize: '0.75rem', 
+          textTransform: 'uppercase', 
+          letterSpacing: '0.05em', 
+          color: '#ffffff',
+          fontWeight: 'bold'
+        }}>
+          Question {index + 1} — {questionData.type}
+        </span>
+        <h3 style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem', color: '#f9fafb' }}>{questionData.question}</h3>
       </div>
 
       <div className="answer-input" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -187,8 +181,8 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
             gap: '0.75rem',
             padding: '0.75rem 1rem',
             borderRadius: '8px',
-            backgroundColor: selectedOption === option ? '#1e293b' : '#020617',
-            border: `1px solid ${selectedOption === option ? '#38bdf8' : '#1e293b'}`,
+            backgroundColor: selectedOption === option ? '#27272a' : '#09090b',
+            border: `1px solid ${selectedOption === option ? '#ffffff' : '#27272a'}`,
             cursor: 'pointer',
             transition: 'all 0.2s ease'
           }}>
@@ -199,7 +193,7 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
               checked={selectedOption === option}
               onChange={(e) => setSelectedOption(e.target.value)}
               disabled={result !== null}
-              style={{ accentColor: '#38bdf8' }}
+              style={{ accentColor: '#ffffff' }}
             />
             <span style={{ color: '#e5e7eb' }}>{option}</span>
           </label>
@@ -218,7 +212,7 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
               padding: '1rem',
               borderRadius: '8px',
               backgroundColor: '#020617',
-              border: '1px solid #1e293b',
+              border: '1px solid #27272a',
               color: '#f9fafb',
               fontSize: '0.95rem',
               outline: 'none',
@@ -236,7 +230,7 @@ function QuestionCard({ concept, questionData, index, onSuccess }) {
           width: '100%',
           padding: '0.75rem',
           borderRadius: '9999px',
-          backgroundColor: result ? '#1e293b' : '#38bdf8',
+          backgroundColor: result ? '#27272a' : '#ffffff',
           color: result ? '#9ca3af' : '#020617',
           fontWeight: 'bold',
           cursor: (loading || !selectedOption || result !== null) ? 'default' : 'pointer',

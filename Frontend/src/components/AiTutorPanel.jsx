@@ -20,10 +20,10 @@ const AiTutorPanel = ({ isOpen, onClose }) => {
         bottom: '25px',
         width: '450px',
         height: '700px',
-        backgroundColor: '#0f172a',
+        backgroundColor: '#09090b',
         borderRadius: '24px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.2)',
-        border: '1px solid #334155',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.1)',
+        border: '1px solid #27272a',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 2000,
@@ -33,30 +33,30 @@ const AiTutorPanel = ({ isOpen, onClose }) => {
       {/* Header */}
       <div style={{ 
         padding: '12px 20px', 
-        background: '#1e293b', 
+        background: '#18181b', 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
-        borderBottom: '1px solid #334155'
+        borderBottom: '1px solid #27272a'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></div>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ffffff', boxShadow: '0 0 8px #ffffff' }}></div>
           <span style={{ fontSize: '14px', fontWeight: '600', color: '#f1f5f9', letterSpacing: '0.02em' }}>AI Learning Tutor</span>
         </div>
         
         <button 
           onClick={onClose}
           style={{ 
-            background: 'rgba(51, 65, 85, 0.5)', 
+            background: 'rgba(39, 39, 42, 0.5)', 
             border: 'none', 
             borderRadius: '10px', 
             padding: '6px', 
-            color: '#94a3b8', 
+            color: '#71717a', 
             cursor: 'pointer',
             transition: 'all 0.2s'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#f1f5f9'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+          onMouseEnter={(e) => e.currentTarget.style.color = '#f8fafc'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#71717a'}
         >
           <X size={20} />
         </button>

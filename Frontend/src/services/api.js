@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = 'http://localhost:5006/api';
 
 const getHeaders = () => {
     const token = localStorage.getItem('thinkmap_token');

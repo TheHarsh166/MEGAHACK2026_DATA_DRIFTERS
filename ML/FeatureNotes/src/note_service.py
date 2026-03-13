@@ -19,23 +19,31 @@ class NoteService:
             print("[NoteService] WARNING: No GEMINI_API_KEY found.")
             self.model_name = None
 
-    async def generate_note_paragraph(self, concept: str) -> str:
+    async def generate_note_paragraph(self, concept: str, misconception: str = None) -> str:
         """
         Generates a professional, educational paragraph for a specific concept.
-        Uses a robust fallback list of models confirmed to work in other features.
+        Tailors the content if a misconception is provided.
         """
         if not self.model_name:
             return f"Note generation unavailable for {concept} (API Key missing)."
 
-        prompt = f"""
-        You are an expert academic tutor. 
-        Write a concise, educational, and engaging 1-paragraph explanation of the concept: "{concept}".
-        Focus on clarity and depth. Do not use markdown headers or bold text, just return the plain text paragraph.
-        Return ONLY the paragraph text.
-        """
+        if misconception:
+            prompt = f"""
+            You are an expert academic tutor. 
+            A student has a misconception about "{concept}": "{misconception}".
+            Write a concise, educational, and encouraging 1-paragraph explanation of "{concept}" that directly addresses and corrects this specific misconception.
+            Focus on clarity and depth. Do not use markdown headers or bold text, just return the plain text paragraph.
+            Return ONLY the paragraph text.
+            """
+        else:
+            prompt = f"""
+            You are an expert academic tutor. 
+            Write a concise, educational, and engaging 1-paragraph explanation of the concept: "{concept}".
+            Focus on clarity and depth. Do not use markdown headers or bold text, just return the plain text paragraph.
+            Return ONLY the paragraph text.
+            """
         
-        # Robust fallback list based on working models in other features
-        # Removed 'gemini-pro' as it causes 404 in some regions/versions.
+        # Robust fallback list based on working models
         models_to_try = [
             'gemini-1.5-flash', 
             'gemini-1.5-flash-latest',
@@ -61,35 +69,42 @@ class NoteService:
     async def get_notes_for_book(self, user_id: str, hierarchy: Dict[str, Any], concept_states: Dict[str, str]) -> List[Dict[str, Any]]:
         """
         Generates notes for all attempted concepts in a book.
-        A concept is considered "attempted" if it has a state in concept_states.
+        Fetches misconceptions from the database to personalize notes.
         """
+        from ML.feature3_student_knowledge_tracking.database import student_attempts_collection
+        
         all_notes = []
         
-        # Flatten hierarchy to get all concepts and their parent subtopics
+        # Flatten hierarchy
+        concepts_to_process = []
         for main_topic, subtopics in hierarchy.items():
             for subtopic, concepts in subtopics.items():
-                # Check if subtopic itself was attempted
-                if subtopic in concept_states:
-                    paragraph = await self.generate_note_paragraph(subtopic)
-                    state = concept_states.get(subtopic)
-                    all_notes.append({
-                        "header": subtopic,
-                        "content": paragraph,
-                        "highlight": state != "green",
-                        "type": "subtopic"
-                    })
+                concepts_to_process.append((subtopic, "subtopic"))
+                for c in concepts:
+                    concepts_to_process.append((c, "concept"))
+
+        for concept, group_type in concepts_to_process:
+            state_key = concept.replace(".", "_")
+            if state_key in concept_states:
+                # Fetch recent misconception for this concept
+                misconception = None
+                latest_attempt = student_attempts_collection.find_one(
+                    {"userId": user_id, "concept": concept, "misconception.misconception_detected": True},
+                    sort=[("timestamp", -1)]
+                )
+                if latest_attempt:
+                    misconception = latest_attempt.get("misconception", {}).get("misconception")
+
+                paragraph = await self.generate_note_paragraph(concept, misconception)
+                state = concept_states.get(state_key)
                 
-                # Check each concept
-                for concept in concepts:
-                    if concept in concept_states:
-                        paragraph = await self.generate_note_paragraph(concept)
-                        state = concept_states.get(concept)
-                        all_notes.append({
-                            "header": concept,
-                            "content": paragraph,
-                            "highlight": state != "green",
-                            "type": "concept"
-                        })
+                all_notes.append({
+                    "header": concept,
+                    "content": paragraph,
+                    "highlight": state != "green" or misconception is not None,
+                    "type": group_type,
+                    "misconception": misconception
+                })
         
         return all_notes
 

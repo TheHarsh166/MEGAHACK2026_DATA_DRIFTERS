@@ -260,6 +260,63 @@ async def get_leaderboard(timeframe: str = "lifetime"):
     except Exception as exc:
         return {"error": f"Failed to generate leaderboard: {exc}"}
 
+@app.post("/api/recommend-concept")
+async def recommend_concept(request: NoteRequest):
+    """
+    Recommend the next best concept to study based on student history and hierarchy.
+    """
+    try:
+        # Fetch knowledge states for the user
+        knowledge = student_knowledge_collection.find_one({"userId": request.userId})
+        concept_states = knowledge.get("conceptStates", {}) if knowledge else {}
+        
+        # Flatten hierarchy to get all concepts
+        all_concepts = []
+        for main_topic, subtopics in request.hierarchy.items():
+            for subtopic, concepts in subtopics.items():
+                all_concepts.append(subtopic)
+                all_concepts.extend(concepts)
+        
+        # Priority 1: Concepts with detected misconceptions (Red)
+        for c in all_concepts:
+            state = concept_states.get(c.replace(".", "_"))
+            if state == "red":
+                return {
+                    "concept": c, 
+                    "reason": f"You're struggling a bit with '{c}'. Let's clear up those misconceptions first!",
+                    "priority": "high"
+                }
+        
+        # Priority 2: In-progress concepts (Yellow)
+        for c in all_concepts:
+            state = concept_states.get(c.replace(".", "_"))
+            if state == "yellow":
+                return {
+                    "concept": c, 
+                    "reason": f"You've started exploring '{c}'. Let's master it completely!",
+                    "priority": "medium"
+                }
+
+        # Priority 3: First unattempted concept
+        for c in all_concepts:
+            if c.replace(".", "_") not in concept_states:
+                return {
+                    "concept": c, 
+                    "reason": f"Ready for something new? '{c}' is a great next step in your journey.",
+                    "priority": "low"
+                }
+        
+        # Default: First concept in hierarchy if everything is mastered or error
+        first_concept = all_concepts[0] if all_concepts else "General Concepts"
+        return {
+            "concept": first_concept, 
+            "reason": "You've mastered everything here! Want to do a quick review?",
+            "priority": "none"
+        }
+            
+    except Exception as exc:
+        return {"error": f"Failed to recommend concept: {exc}"}
+
 @app.post("/api/notes/generate")
 async def generate_notes_api(request: NoteRequest):
     try:

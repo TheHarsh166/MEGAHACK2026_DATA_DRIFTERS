@@ -33,27 +33,75 @@ function NotesPanel({ userId, hierarchy, onClose }) {
     fetchNotes();
   }, [userId, hierarchy]);
 
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
   return (
     <div className="notes-container" style={{ padding: '1rem', color: '#e2e8f0' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#38bdf8' }}>AI Study Notes</h2>
-        <div style={{ fontSize: '0.8rem', color: '#9ca3af', backgroundColor: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px' }}>
-          {notes.length} Concepts Attempted
+      <style>
+        {`
+          @media print {
+            body * { visibility: hidden; }
+            .notes-print-area, .notes-print-area * { visibility: visible; }
+            .notes-print-area { 
+              position: absolute; 
+              left: 0; 
+              top: 0; 
+              width: 100%;
+              color: black !important;
+              background: white !important;
+            }
+            .no-print { display: none !important; }
+            h2, h3 { color: black !important; }
+            p { color: #333 !important; }
+          }
+        `}
+      </style>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }} className="no-print">
+        <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#ffffff' }}>AI Study Notes</h2>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button 
+            onClick={handleDownloadPDF}
+            style={{
+              padding: '0.4rem 1rem',
+              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              color: '#000',
+              border: 'none',
+              fontSize: '0.85rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            Download PDF
+          </button>
+          <div style={{ fontSize: '0.8rem', color: '#71717a', backgroundColor: '#18181b', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid #27272a' }}>
+            {notes.length} Concepts Attempted
+          </div>
         </div>
       </div>
+
+      <div className="notes-print-area">
+        <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#ffffff02', borderRadius: '8px', fontSize: '0.85rem', color: '#71717a', border: '1px solid #27272a' }}>
+          These notes are personalized based on your quiz performance. Highlighted sections address specific areas where you might have misconceptions.
+        </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem' }}>
           <div className="spinner" style={{ marginBottom: '1rem' }}></div>
-          <p style={{ color: '#9ca3af' }}>AI is synthesizing your notes...</p>
+          <p style={{ color: '#71717a' }}>AI is synthesizing your notes...</p>
         </div>
       ) : error ? (
-        <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#ef444410', borderRadius: '12px', border: '1px solid #ef444430' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#ef444410', borderRadius: '12px', border: '1px solid #ef444420' }}>
           <p style={{ color: '#f87171' }}>{error}</p>
         </div>
       ) : notes.length === 0 ? (
-        <div style={{ padding: '3rem', textAlign: 'center', backgroundColor: '#0f172a', borderRadius: '12px', border: '1px dashed #1e293b' }}>
-          <p style={{ color: '#9ca3af' }}>No notes generated yet. Start by taking a quiz on any concept in the map!</p>
+        <div style={{ padding: '3rem', textAlign: 'center', backgroundColor: '#09090b', borderRadius: '12px', border: '1px dashed #27272a' }}>
+          <p style={{ color: '#71717a' }}>No notes generated yet. Start by taking a quiz on any concept in the map!</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -64,7 +112,7 @@ function NotesPanel({ userId, hierarchy, onClose }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               style={{
-                borderLeft: note.highlight ? '4px solid #ef4444' : '4px solid #38bdf8',
+                borderLeft: note.highlight ? '4px solid #ef4444' : '4px solid #ffffff',
                 paddingLeft: '1.5rem',
                 backgroundColor: note.highlight ? '#ef444405' : 'transparent'
               }}
@@ -92,9 +140,10 @@ function NotesPanel({ userId, hierarchy, onClose }) {
                 {note.content}
               </p>
             </motion.div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

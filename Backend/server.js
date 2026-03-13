@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
 const User = require('./models/User');
@@ -10,8 +11,10 @@ const Book = require('./models/Book');
 const QuizResult = require('./models/QuizResult');
 const auth = require('./middleware/auth');
 
+const client = new OAuth2Client(process.env.CLIENT_ID);
+
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5006;
 console.log('--- STARTING SERVER ON PORT', PORT, '---');
 
 // Middleware
@@ -82,6 +85,54 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const { email, sub: googleId, name, picture } = payload;
+
+    let user = await User.findOne({ 
+      $or: [{ googleId }, { email }] 
+    });
+
+    if (!user) {
+      user = new User({
+        email,
+        googleId,
+        name,
+        picture
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      // Link Google ID if user exists by email but hasn't used Google yet
+      user.googleId = googleId;
+      user.name = name;
+      user.picture = picture;
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { userId: user._id }, 
+      process.env.JWT_SECRET || 'secret_key', 
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: 'Google login successful',
+      token,
+      user: { id: user._id, email: user.email, name: user.name, picture: user.picture }
+    });
+  } catch (err) {
+    console.error('GOOGLE AUTH ERROR:', err);
+    res.status(401).json({ error: 'Auth failed', details: err.message });
   }
 });
 
