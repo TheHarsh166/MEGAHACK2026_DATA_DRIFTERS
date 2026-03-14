@@ -1,23 +1,59 @@
-google-genai
-pytesseract
-easyocr
-python-docx
+# Consolidated Requirements for ML Features
+# This file combines dependencies from all feature folders:
+# - agent1/requirements.txt
+# - feature_research/requirements.txt
+# - feature_3/requirements.txt
+# - feature1/requirements.txt
+# - Feature7/requirements.txt
+# - Feature8/requirements.txt
+
+# Core Framework & API
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings
+typing-extensions>=4.8.0
+python-multipart
+
+# Agentic AI (LangChain/LangGraph)
+langchain>=0.1.0
+langgraph>=0.0.20
+
+# Machine Learning & NLP
+torch
+transformers
+sentence-transformers>=2.2.2
+datasets
+scikit-learn>=1.3.2
+numpy>=1.24.3
+pandas
+faiss-cpu>=1.7.4
 spacy
 nltk
-pydantic
-pydantic-settings
-numpy
-pandas
+
+# Deep Learning & TensorFlow
+tf-keras>=2.20.0
+
+# Google AI
+google-genai
+
+# Computer Vision & OCR
+pytesseract
+easyocr
 Pillow
-pytest
-streamlit
-fastapi
-uvicorn[standard]
-datasets
-transformers
-torch
+
+# Document Processing
+python-docx
+
+# HTTP & Async
+httpx>=0.28.1,<0.29
+anyio>=4.8.0,<5.0.0
+
+# Configuration & Data
 pyyaml
-sentence-transformers
-scikit-learn
-faiss-cpu
-python-multipart
+
+# Testing
+pytest>=7.4.3
+
+# Web Interface
+streamlit
