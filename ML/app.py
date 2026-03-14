@@ -119,6 +119,49 @@ async def get_student_knowledge(userId: str):
     except Exception as exc:
         return {"error": f"Failed to fetch knowledge states: {exc}"}
 
+from ML.feature3_student_knowledge_tracking.services.support_service import detect_struggle, get_struggle_support
+
+class TrackAttemptRequest(BaseModel):
+    userId: str
+    questionId: str
+    concept: str
+    timeSpent: int
+    attempts: int
+    reasoningScore: Optional[float] = 1.0
+
+class SupportContentRequest(BaseModel):
+    type: str # hint, example, simplify
+    questionText: str
+    concept: str
+    studentExplanation: Optional[str] = ""
+
+@app.post("/api/track-attempt")
+async def track_attempt(request: TrackAttemptRequest):
+    """
+    Track student behavior and detect struggle.
+    """
+    is_struggling = detect_struggle(request.timeSpent, request.attempts, request.reasoningScore)
+    
+    if is_struggling:
+        return {
+            "intervention": True,
+            "helpOptions": ["hint", "example", "simplify", "skip"]
+        }
+    return {"intervention": False}
+
+@app.post("/api/get-support-content")
+async def get_support_content(request: SupportContentRequest):
+    """
+    Generate help content for a struggling student.
+    """
+    content = await get_struggle_support(
+        type=request.type,
+        question_text=request.questionText,
+        concept=request.concept,
+        student_explanation=request.studentExplanation
+    )
+    return {"content": content}
+
 @app.get("/api/student-attempts/{userId}/{concept:path}")
 async def get_student_attempts(userId: str, concept: str):
     try:
